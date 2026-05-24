@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using PListNet;
 using PListNet.Nodes;
 
@@ -5,9 +6,9 @@ namespace db;
 
 public class ITunesImporter : IImporter {
 	public string? FilePath { get; private set; }
-	private Context db;
+	private DbContext db;
 	
-	public ITunesImporter(string path, Context db) {
+	public ITunesImporter(string path, DbContext db) {
 		this.db = db;
 		this.ValidateFile(path);
 	}

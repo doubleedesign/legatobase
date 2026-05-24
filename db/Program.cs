@@ -1,12 +1,15 @@
 ﻿using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Spectre.Console;
 
 namespace db;
 
+
 class Program {
 	static void Main(string[] args) {
 		Console.OutputEncoding = Encoding.UTF8;
-		using var db = new Context();
+		var db = new DbCreator();
+		db.Create();
 		
 		var action = AnsiConsole.Prompt(
 			new SelectionPrompt<string>()
@@ -15,7 +18,7 @@ class Program {
 
 		switch (action) {
 			case "Import iTunes library":
-				Import(db);
+				//Import();
 				break;
 			default:
 				Environment.Exit(0);
@@ -23,7 +26,7 @@ class Program {
 		}
 	}
 
-	static void Import(Context db) {
+	static void Import(DbContext db) {
 		var filePath = "";
 		
 		while (string.IsNullOrEmpty(filePath)) {
