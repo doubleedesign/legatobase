@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using PListNet;
-using PListNet.Nodes;
+using Plist.Kit;
+using Plist.Kit.Core.Types;
 
 namespace db;
 
@@ -22,15 +22,8 @@ public class ITunesImporter : IImporter {
 		}
 
 		try {
-			using (var fileStream = File.OpenRead(trimmed)) {
-				var node = PList.Load(fileStream);
-            
-				// Check if root is a Dictionary
-				if (node is DictionaryNode) {
-					this.FilePath = trimmed;
-					Logger.Success("XML file is valid");
-				}
-			}
+			var doc = PlistDocument.Load(trimmed);
+			// TODO Validation
 		}
 		catch (Exception ex) {
 			Logger.Error(ex.Message);
@@ -39,6 +32,18 @@ public class ITunesImporter : IImporter {
 	}
 	
 	public void Import() {
-		throw new NotImplementedException();
+		if (String.IsNullOrEmpty(this.FilePath)) {
+			throw new FileNotFoundException();
+		}
+		
+		try {
+			var doc = PlistDocument.Load(this.FilePath);
+			// TODO: Import logic
+		}
+		catch (Exception ex) {
+			Logger.Error(ex.Message);
+			Environment.Exit(1);
+		}
+		
 	}
 }
