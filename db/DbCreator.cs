@@ -13,7 +13,14 @@ public class DbCreator {
 
 	public void Create() {
 		this.MaybeCreateDb();
-		this.CreateTables();
+		using var connection = new SqliteConnection("Data Source=" + this.DbPath);
+		connection.Open();
+		this.CreateTables(connection);
+		connection.Close();
+	}
+
+	public string GetDbPath() {
+		return this.DbPath ?? "";
 	}
 
 	private void MaybeCreateDirectory() {
@@ -69,22 +76,14 @@ public class DbCreator {
 		}
 	}
 
-	private void CreateTables() {
-		if (String.IsNullOrEmpty(DbPath)) {
-			throw new FileNotFoundException();
-		}
-		
-		Logger.Info("Using database at: " + this.DbPath);
-		using var connection = new SqliteConnection("Data Source=" + this.DbPath);
-		connection.Open();
-
-		var tables = new[] {
-			@"CREATE TABLE IF NOT EXISTS Genres (
+	private void CreateTables(SqliteConnection connection) {
+		var tables = new Dictionary<string, string> {
+			["Genres"] = @"CREATE TABLE IF NOT EXISTS Genres (
 				Id		INTEGER PRIMARY KEY AUTOINCREMENT,
 				Label	VARCHAR	NOT NULL
 			)",
 
-			@"CREATE TABLE IF NOT EXISTS Tracks (
+			["Tracks"] = @"CREATE TABLE IF NOT EXISTS Tracks (
 				Id			INTEGER PRIMARY KEY AUTOINCREMENT,
 				Title		VARCHAR	NOT NULL,
 				Year		INTEGER,
@@ -97,7 +96,7 @@ public class DbCreator {
 				FOREIGN KEY (GenreId) REFERENCES Genres(Id)
 			)",
 			
-			@"CREATE TABLE IF NOT EXISTS Artists(
+			["Artists"] = @"CREATE TABLE IF NOT EXISTS Artists(
     			Id			INTEGER PRIMARY KEY AUTOINCREMENT,
 				Name 		VARCHAR	NOT NULL,
 				MBID 		VARCHAR,
@@ -109,14 +108,14 @@ public class DbCreator {
 				Deathdate 	DATETIME
 			)",	
 			
-			@"CREATE TABLE IF NOT EXISTS ArtistGroups(
+			["ArtistGroups"] = @"CREATE TABLE IF NOT EXISTS ArtistGroups(
 			    ArtistId 	INTEGER NOT NULL,
 			    GroupId 	INTEGER NOT NULL,
 			    FOREIGN KEY (ArtistId) REFERENCES Artists(Id),
 			    FOREIGN KEY (GroupId) REFERENCES Artists(Id)
 			)",
 			
-			@"CREATE TABLE IF NOT EXISTS Albums(
+			["Albums"] = @"CREATE TABLE IF NOT EXISTS Albums(
     			Id 			INTEGER PRIMARY KEY AUTOINCREMENT,
     			Title  		VARCHAR NOT NULL,
     			ArtistId  	INTEGER NOT NULL,
@@ -128,21 +127,21 @@ public class DbCreator {
     			FOREIGN KEY (ArtistId) REFERENCES Artists(Id)
 			)",
 			
-			@"CREATE TABLE IF NOT EXISTS ArtistTypes(
+			["ArtistTypes"] = @"CREATE TABLE IF NOT EXISTS ArtistTypes(
     			Id		INTEGER PRIMARY KEY AUTOINCREMENT,
     			Label 	VARCHAR	NOT NULL
     		)",
 			
-			@"CREATE TABLE IF NOT EXISTS ArtistsTracks(
+			["Artists_Tracks"] = @"CREATE TABLE IF NOT EXISTS Artists_Tracks(
     			TrackId 		INTEGER NOT NULL,
-    			AritstId 		INTEGER NOT NULL,
+    			ArtistId		INTEGER NOT NULL,
     			AristTypeId 	INTEGER NOT NULL,
     			FOREIGN KEY (TrackId) REFERENCES Tracks(Id),
-    			FOREIGN KEY (AritstId) REFERENCES Artists(Id),
+    			FOREIGN KEY (ArtistId) REFERENCES Artists(Id),
 				FOREIGN KEY (AristTypeId) REFERENCES ArtistTypes(Id)
 			)",
 			
-			@"CREATE TABLE IF NOT EXISTS AlbumTracks(
+			["Albums_Tracks"] = @"CREATE TABLE IF NOT EXISTS Albums_Tracks(
     			TrackId 		INTEGER NOT NULL,
     			AlbumId			INTEGER NOT NULL,
     			TrackNumber 	INTEGER,
@@ -153,11 +152,24 @@ public class DbCreator {
 		};
 
 		Logger.Info("Creating database tables");
-		foreach (var sql in tables) {
+		foreach (var (tableName, sql) in tables) {
 			try {
+				if(this.TableExists(tableName, connection)) {
+					Logger.Success($"Table {tableName} exists");
+					continue;
+				}
+				
+				Logger.Info($"Creating table {tableName}");
 				using var cmd = connection.CreateCommand();
 				cmd.CommandText = sql;
 				cmd.ExecuteNonQuery();
+				
+				if(this.TableExists(tableName, connection)) {
+					Logger.Success($"Created table {tableName}");
+				}
+				else {
+					throw new Exception($"Failed to create table {tableName}");
+				}
 			}
 			catch (Exception e) {
 				Logger.Error(e.Message);
@@ -165,23 +177,23 @@ public class DbCreator {
 			}
 		}
 		
-		// Check if the tables have been created
-		var tableNames = new[] { "Genres", "Tracks", "Artists", "ArtistGroups", "Albums", "ArtistTypes", "ArtistsTracks", "AlbumTracks" };
-		foreach (var table in tableNames) {
-			using var cmd = connection.CreateCommand();
-			cmd.CommandText = $"SELECT name FROM sqlite_master WHERE type='table' AND name='{table}'";
-			var result = cmd.ExecuteScalar();
-			if (result is null) {
-				Logger.Error($"Table {table} was not created successfully");
-			}
-			else if (result.ToString() == table) {
-				Logger.Success($"Table {table} created or was already there");
-			}
-			else {
-				Logger.Error($"Unexpected result when checking for table {table}: {result}");
-			}
-		}
-
 		connection.Close();
+	}
+
+	private bool TableExists(string tableName, SqliteConnection connection) {
+		using var cmd = connection.CreateCommand();
+		cmd.CommandText = $"SELECT name FROM sqlite_master WHERE type='table' AND name='{tableName}'";
+		var result = cmd.ExecuteScalar();
+		
+		if (result is null) {
+			return false;
+		}
+		
+		if (result.ToString() == tableName) {
+			return true;
+		}
+	
+		Logger.Error($"Unexpected result when checking for table {tableName}: {result}");
+		return false;
 	}
 }

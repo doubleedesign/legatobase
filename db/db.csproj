@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -8,6 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.8" />
       <PackageReference Include="Plist.Kit" Version="1.0.0" />
       <PackageReference Include="Spectre.Console" Version="0.55.2" />
