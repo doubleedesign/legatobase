@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace db;
+namespace setup;
 
 public interface IImporter {
 

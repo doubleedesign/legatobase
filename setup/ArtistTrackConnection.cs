@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace db;
+namespace setup;
 
 public partial class ArtistTrackConnection
 {

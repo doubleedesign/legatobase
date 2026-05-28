@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Plist.Kit;
 using Plist.Kit.Core.Types;
 
-namespace db;
+namespace setup;
 
 public class ITunesImporter : IImporter {
 	public string? FilePath { get; private set; }

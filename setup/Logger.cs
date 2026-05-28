@@ -1,4 +1,4 @@
-namespace db;
+namespace setup;
 
 public class Logger {
 	public static void Success(string message) {

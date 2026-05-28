@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Spectre.Console;
 
-namespace db;
+namespace setup;
 
 
 class Program {

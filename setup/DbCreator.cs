@@ -1,7 +1,7 @@
 using System.Text;
 using Microsoft.Data.Sqlite;
 
-namespace db;
+namespace setup;
 
 public class DbCreator {
 	private string? DbPath { get; set; }

@@ -1,4 +1,4 @@
-namespace db;
+namespace setup;
 using Microsoft.EntityFrameworkCore.Design;
 using Humanizer;
 
