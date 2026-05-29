@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
@@ -58,7 +58,8 @@ class Program {
 				FileName = "dotnet",
 				Arguments = $"ef dbcontext scaffold " +
 				            $"\"Data Source={dbFilePath}\" Microsoft.EntityFrameworkCore.Sqlite " +
-				            $"--context LbContext " +
+				            $"--context LbContextBase " +
+				            "--no-onconfiguring " +
 							$"--force ",
 				WorkingDirectory = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\..\")),
 				RedirectStandardOutput = true,
