@@ -23,8 +23,11 @@ public class ITunesImporter : IImporter {
 		}
 
 		try {
-			var doc = PlistDocument.Load(trimmed);
-			// TODO Validation
+			var doc = PlistDocument.Load(trimmed).ToDictionary();
+			var keys = doc.Keys;
+			if (!keys.Contains("Library Persistent ID") || !keys.Contains("Tracks") || !keys.Contains("Music Folder")) {
+				throw new InvalidDataException("The provided file does not appear to be a valid iTunes library XML file.");
+			}
 			
 			this.FilePath = trimmed;
 		}
