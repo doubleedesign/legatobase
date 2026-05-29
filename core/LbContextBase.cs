@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace setup;
+namespace core;
 
 public partial class LbContextBase : DbContext
 {

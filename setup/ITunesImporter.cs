@@ -1,3 +1,4 @@
+using core;
 using Microsoft.EntityFrameworkCore;
 using Plist.Kit;
 using Plist.Kit.Core.Types;
@@ -8,8 +9,8 @@ public class ITunesImporter : IImporter {
 	public string? FilePath { get; private set; }
 	private DbContext db;
 	
-	public ITunesImporter(string path, DbContext db) {
-		this.db = db;
+	public ITunesImporter(string path) {
+		this.db = new LbContext(new DbContextOptions<LbContextBase>());
 		this.ValidateFile(path);
 	}
 
@@ -24,6 +25,8 @@ public class ITunesImporter : IImporter {
 		try {
 			var doc = PlistDocument.Load(trimmed);
 			// TODO Validation
+			
+			this.FilePath = trimmed;
 		}
 		catch (Exception ex) {
 			Logger.Error(ex.Message);

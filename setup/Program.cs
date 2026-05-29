@@ -20,7 +20,7 @@ class Program {
 
 		switch (action) {
 			case "Import iTunes library":
-				//Import();
+				Import();
 				break;
 			case "Regenerate EF Core classes":
 				RegenerateClasses(db.GetDbPath());
@@ -38,30 +38,36 @@ class Program {
 		return db;
 	}
 
-	static void Import(DbContext db) {
+	static void Import() {
 		var filePath = "C:/Users/leesa/Desktop/Library-2026-05-23.xml"; // FIXME: This is temporary, remove it
 		
 		while (string.IsNullOrEmpty(filePath)) {
 			filePath = Logger.Input("Enter the path to your iTunes library XML file:");
 		}
 		
-		var importer = new ITunesImporter(filePath, db);
+		var importer = new ITunesImporter(filePath);
+		importer.Import();
 	}
 
 	static void RegenerateClasses(string dbFilePath) {
 		Console.WriteLine("");
 		Logger.Info("Regenerating Entity Framework classes");
 		Logger.Warning("Existing classes will be replaced to match the current database schema");
+		var solutionRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\..\..\"));
 		
 		var process = new Process {
 			StartInfo = new ProcessStartInfo {
 				FileName = "dotnet",
 				Arguments = $"ef dbcontext scaffold " +
 				            $"\"Data Source={dbFilePath}\" Microsoft.EntityFrameworkCore.Sqlite " +
+				            $"--startup-project setup/setup.csproj " +
+				            $"--output-dir {solutionRoot}/core " +
 				            $"--context LbContextBase " +
 				            "--no-onconfiguring " +
+				            "--namespace core " +
+				            "--context-namespace core " +
 							$"--force ",
-				WorkingDirectory = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\..\")),
+				WorkingDirectory = solutionRoot,
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,
 				UseShellExecute = false
