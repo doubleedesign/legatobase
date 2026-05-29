@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
@@ -10,9 +10,9 @@ namespace setup;
 class Program {
 	static void Main(string[] args) {
 		Console.OutputEncoding = Encoding.UTF8;
-		var db = new DbCreator();
-		db.Create();
+		var db = EnsureDbExists();
 		
+		// Prompt for next action
 		var action = AnsiConsole.Prompt(
 			new SelectionPrompt<string>()
 				.Title("What would you like to do?")
@@ -29,6 +29,13 @@ class Program {
 				Environment.Exit(0);
 				break;
 		}
+	}
+
+	private static DbCreator EnsureDbExists() {
+		var db = new DbCreator();
+		db.Create();
+		
+		return db;
 	}
 
 	static void Import(DbContext db) {
