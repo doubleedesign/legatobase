@@ -44,6 +44,7 @@ public class ContextUtils {
 		if (File.Exists(envPath)) {
 			Logger.Success($"Created local environment file at {envPath}");
 			this.EnvFilePath = envPath;
+			return;
 		}
 		
 		throw new Exception("Failed to find or create local environment file at " + envPath);
