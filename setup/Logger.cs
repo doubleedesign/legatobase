@@ -7,7 +7,7 @@ public class Logger {
 		Console.ResetColor();
 	}
 	
-	public static void Error(string message) {
+	public static void Error(string? message) {
 		Console.ForegroundColor = ConsoleColor.Red;
 		Console.WriteLine("❌  " + message);
 		Console.ResetColor();
