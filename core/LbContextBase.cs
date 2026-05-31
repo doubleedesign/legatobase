@@ -23,6 +23,8 @@ public partial class LbContextBase : DbContext
 
     public virtual DbSet<ArtistType> ArtistTypes { get; set; }
 
+    public virtual DbSet<FileType> FileTypes { get; set; }
+
     public virtual DbSet<Genre> Genres { get; set; }
 
     public virtual DbSet<Track> Tracks { get; set; }
@@ -111,6 +113,11 @@ public partial class LbContextBase : DbContext
             entity.Property(e => e.Label).HasColumnType("VARCHAR");
         });
 
+        modelBuilder.Entity<FileType>(entity =>
+        {
+            entity.Property(e => e.Label).HasColumnType("VARCHAR");
+        });
+
         modelBuilder.Entity<Genre>(entity =>
         {
             entity.Property(e => e.Label).HasColumnType("VARCHAR");
@@ -118,6 +125,7 @@ public partial class LbContextBase : DbContext
 
         modelBuilder.Entity<Track>(entity =>
         {
+            entity.Property(e => e.FileLocation).HasColumnType("VARCHAR");
             entity.Property(e => e.Isrc)
                 .HasColumnType("VARCHAR")
                 .HasColumnName("ISRC");
@@ -127,7 +135,6 @@ public partial class LbContextBase : DbContext
             entity.Property(e => e.Mbid)
                 .HasColumnType("VARCHAR")
                 .HasColumnName("MBID");
-            entity.Property(e => e.Playcount).HasColumnName("playcount");
             entity.Property(e => e.ShsId).HasColumnName("SHS_ID");
             entity.Property(e => e.Title).HasColumnType("VARCHAR");
 

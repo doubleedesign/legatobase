@@ -25,17 +25,28 @@ public class DbCreator : ContextUtils {
 			)",
 
 			["Tracks"] = @"CREATE TABLE IF NOT EXISTS Tracks (
-				Id			INTEGER PRIMARY KEY AUTOINCREMENT,
-				Title		VARCHAR	NOT NULL,
-				Year		INTEGER,
-				GenreId 	INTEGER,
-				ISRC 		VARCHAR,
-				ISWC 		VARCHAR,
-				SHS_ID 		INTEGER,
-				MBID 		VARCHAR,
-				playcount	INTEGER,
+				Id				INTEGER PRIMARY KEY AUTOINCREMENT,
+				Title			VARCHAR	NOT NULL,
+				Year			INTEGER,
+				GenreId 		INTEGER,
+				ISRC 			VARCHAR,
+				ISWC 			VARCHAR,
+				SHS_ID 			INTEGER,
+				MBID 			VARCHAR,
+				PlayCount		INTEGER,
+				FileLocation 	VARCHAR,
+				FileSize 		INTEGER,
+				FileTypeId 		INTEGER,
+				Length			INTEGER,
+				BitRate 		INTEGER,
+				SampleRate		INTEGER,
 				FOREIGN KEY (GenreId) REFERENCES Genres(Id)
 			)",
+			
+			["FileTypes"] = @"CREATE TABLE IF NOT EXISTS FileTypes (
+    			Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    			Label VARCHAR NOT NULL
+    		)",
 			
 			["Artists"] = @"CREATE TABLE IF NOT EXISTS Artists(
     			Id			INTEGER PRIMARY KEY AUTOINCREMENT,

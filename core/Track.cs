@@ -21,7 +21,19 @@ public partial class Track
 
     public string? Mbid { get; set; }
 
-    public int? Playcount { get; set; }
+    public int? PlayCount { get; set; }
+
+    public string? FileLocation { get; set; }
+
+    public int? FileSize { get; set; }
+
+    public int? FileTypeId { get; set; }
+
+    public int? Length { get; set; }
+
+    public int? BitRate { get; set; }
+
+    public int? SampleRate { get; set; }
 
     public virtual Genre? Genre { get; set; }
 }
