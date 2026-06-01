@@ -1,4 +1,4 @@
-namespace setup;
+namespace common;
 
 public class Logger {
 	public static void Success(string message) {

@@ -1,7 +1,7 @@
 using core;
+using common;
 using Microsoft.EntityFrameworkCore;
 using Plist.Kit;
-using Plist.Kit.Core;
 using Plist.Kit.Core.Types;
 
 namespace setup;
@@ -45,13 +45,19 @@ public class ITunesImporter : IImporter {
 		
 		try {
 			var doc = PlistDocument.Load(this.FilePath);
-			var tracks = doc.Get("Tracks");
-			if (tracks is not PlistDictionary) {
+			if (doc.Get("Tracks") is not PlistDictionary) {
 				throw new InvalidDataException("Could not find valid track data in the provided XML file.");
 			}
 			
-			this.FilterTracks((PlistDictionary)tracks);
+			// Cast tracks to PListDictionary type once
+			PlistDictionary tracks = (PlistDictionary)doc.Get("Tracks")!;
 			
+			this.FilterTracks(tracks);
+			var enumerator = tracks.GetEnumerator();
+			while (enumerator.MoveNext()) {
+				var track = enumerator.Current.Value.ToNative();
+				Console.WriteLine(); 
+			}
 		}
 		catch (Exception ex) {
 			Logger.Error(ex.Message);
@@ -62,14 +68,18 @@ public class ITunesImporter : IImporter {
 	
 	private void FilterTracks(PlistDictionary tracks) {
 		Logger.Info($"{tracks.Count} items found");
-		
-		foreach (var key in tracks.Keys) {
-			var data = tracks[key].ToNative() as Dictionary<string, object>;
-			if (data == null || !this.IncludeItem(data)) {
-				tracks.Remove(key);
-			}
+
+		var keysToRemove = tracks.Keys
+			.Where(key => {
+				var data = tracks[key].ToNative() as Dictionary<string, object>;
+				return data == null || !this.IncludeItem(data);
+			})
+			.ToList();
+
+		foreach (var key in keysToRemove) {
+			tracks.Remove(key);
 		}
-		
+
 		Logger.Info($"{tracks.Count} tracks found after filtering");
 	}
 
@@ -88,4 +98,5 @@ public class ITunesImporter : IImporter {
 
 		return true;
 	}
+
 }

@@ -1,4 +1,6 @@
 <Solution>
+  <Project Path="api/api.csproj" />
+  <Project Path="common/common.csproj" />
   <Project Path="core/core.csproj" />
   <Project Path="setup/setup.csproj" />
 </Solution>

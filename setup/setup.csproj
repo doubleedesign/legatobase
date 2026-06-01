@@ -9,6 +9,8 @@
     
     <ItemGroup>
         <ProjectReference Include="../core/core.csproj" />
+        <ProjectReference Include="../common/common.csproj" />
+        <ProjectReference Include="../api/api.csproj" />
     </ItemGroup>
 
     <ItemGroup>

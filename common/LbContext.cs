@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using core;
 
-namespace setup;
+namespace common;
 
 public class LbContext(DbContextOptions<LbContextBase> options) : LbContextBase(options) {
 	private string? _dbPath = new ContextUtils().GetDbPath();

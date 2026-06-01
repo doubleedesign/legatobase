@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace setup;
+namespace common;
 
 public class ContextUtils {
 	protected string? EnvFilePath { get; set; }

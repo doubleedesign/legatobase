@@ -1,11 +1,9 @@
 ﻿using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
+using common;
 using Spectre.Console;
 
 namespace setup;
-
 
 class Program {
 	static void Main(string[] args) {
