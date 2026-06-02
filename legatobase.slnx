@@ -3,4 +3,5 @@
   <Project Path="common/common.csproj" />
   <Project Path="core/core.csproj" />
   <Project Path="setup/setup.csproj" />
+  <Project Path="tests/tests.csproj" />
 </Solution>

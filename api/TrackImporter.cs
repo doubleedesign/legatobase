@@ -21,7 +21,7 @@ public class TrackImporter {
 		
 		data.TryGetValue("Genre", out var genreLabel);
 		Genre? genre = !genreLabel.IsNull() ? this.FindOrCreateGenre(genreLabel.AsString()!) : null;
-
+	
 		data.TryGetValue("Kind", out var fileTypeName);
 		FileType? fileType = !fileTypeName.IsNull() ? this.FindOrCreateFileType(fileTypeName.AsString()!) : null;
 		
@@ -46,7 +46,7 @@ public class TrackImporter {
 				// TODO: Further refine with MBID data if available
 			}
 		}
-
+	
 		Track result = new Track {
 			Title = title.ToString().Trim(),
 			Year = data.GetValueOrDefault("Year").AsInt(),
@@ -75,13 +75,13 @@ public class TrackImporter {
 		if (found is not null) {
 			return found;
 		}
-
+	
 		var genre = new Genre { Label = label };
 		this.db.Genres.Add(genre);
 		
 		return genre;
 	}
-
+	
 	private FileType FindOrCreateFileType(string label) {
 		FileType? found = this.db.FileTypes.FirstOrDefault(item => item.Label.Equals(label));
 		if (found is not null) {
