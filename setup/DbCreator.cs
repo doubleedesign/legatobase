@@ -1,7 +1,7 @@
-using common;
+using Legatobase.Common;
 using Microsoft.Data.Sqlite;
 
-namespace setup;
+namespace Legatobase.Setup;
 
 public class DbCreator : ContextUtils {
 

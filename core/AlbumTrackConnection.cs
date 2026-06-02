@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace core;
+namespace Legatobase.Core;
 
 public partial class AlbumTrackConnection
 {

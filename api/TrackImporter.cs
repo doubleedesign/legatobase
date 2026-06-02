@@ -1,9 +1,8 @@
-using core;
-using common;
-using Microsoft.EntityFrameworkCore;
+using Legatobase.Core;
+using Legatobase.Common;
 using OneOf;
 
-namespace api;
+namespace Legatobase.API;
 
 using TrackData = Dictionary<string, OneOf<string, int>>;
 

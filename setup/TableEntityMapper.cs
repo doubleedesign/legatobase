@@ -1,4 +1,4 @@
-namespace setup;
+namespace Legatobase.Setup;
 using Microsoft.EntityFrameworkCore.Design;
 using Humanizer;
 

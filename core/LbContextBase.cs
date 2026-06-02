@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace core;
+namespace Legatobase.Core;
 
 public partial class LbContextBase : DbContext
 {

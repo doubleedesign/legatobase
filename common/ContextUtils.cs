@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace common;
+namespace Legatobase.Common;
 
 public class ContextUtils {
 	protected string? EnvFilePath { get; set; }

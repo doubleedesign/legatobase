@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics;
 using System.Text;
-using common;
+using Legatobase.Common;
 using Spectre.Console;
 
-namespace setup;
+namespace Legatobase.Setup;
 
 class Program {
 	static void Main(string[] args) {
@@ -62,8 +62,8 @@ class Program {
 				            $"--output-dir {solutionRoot}/core " +
 				            $"--context LbContextBase " +
 				            "--no-onconfiguring " +
-				            "--namespace core " +
-				            "--context-namespace core " +
+				            "--namespace Legatobase.Core " +
+				            "--context-namespace Legatobase.Core " +
 							$"--force ",
 				WorkingDirectory = solutionRoot,
 				RedirectStandardOutput = true,

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace setup;
+namespace Legatobase.Setup;
 
 public interface IImporter {
 

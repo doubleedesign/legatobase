@@ -1,4 +1,4 @@
-namespace common;
+namespace Legatobase.Common;
 
 public class Logger {
 	public static void Success(string message) {

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using core;
+using Legatobase.Core;
 
-namespace common;
+namespace Legatobase.Common;
 
 public class LbContext(DbContextOptions<LbContextBase> options) : LbContextBase(options) {
 	private string? _dbPath = new ContextUtils().GetDbPath();

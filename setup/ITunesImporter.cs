@@ -1,10 +1,10 @@
-using core;
-using common;
+using Legatobase.Core;
+using Legatobase.Common;
 using Microsoft.EntityFrameworkCore;
 using Plist.Kit;
 using Plist.Kit.Core.Types;
 
-namespace setup;
+namespace Legatobase.Setup;
 
 public class ITunesImporter : IImporter {
 	public string? FilePath { get; private set; }
