@@ -10,6 +10,7 @@ class Program {
 		Console.OutputEncoding = Encoding.UTF8;
 		Logger.Info("Legatobase version", Config.GetVersion());
 		EnsureDbExists();
+		EnterCredentials();
 		
 		// Prompt for next action
 		var action = AnsiConsole.Prompt(
@@ -89,6 +90,15 @@ class Program {
 		}
 		if (!string.IsNullOrEmpty(error)) {
 			Logger.Error(error);
+		}
+	}
+
+	static void EnterCredentials() {
+		var discogs = Config.GetCredential("Discogs");
+		if (discogs == null) {
+			string discogsConsumerKey = Logger.Input("Enter your Discogs  consumer key:");
+			string discogsConsumerSecret = Logger.Input("Enter your Discogs consumer secret:");
+			Config.SetCredential("Discogs", discogsConsumerKey, discogsConsumerSecret);
 		}
 	}
 }

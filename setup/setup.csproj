@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="AdysTech.CredentialManager" Version="3.1.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.8" />
