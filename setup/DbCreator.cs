@@ -1,16 +1,19 @@
+using Legatobase.API;
 using Legatobase.Common;
 using Microsoft.Data.Sqlite;
 
 namespace Legatobase.Setup;
 
-public class DbCreator : ContextUtils {
+public class DbCreator {
+	private readonly string _dbPath;
 
-	public DbCreator(): base() {
+	public DbCreator() {
+		this._dbPath = Config.GetDbPath();
 		this.EnsureDbFileCreated();
 	}
 
 	public void Create() {
-		using var connection = new SqliteConnection("Data Source=" + this.DbPath);
+		using var connection = new SqliteConnection("Data Source=" + this._dbPath);
 		connection.Open();
 		this.CreateTables(connection);
 		connection.Close();
@@ -149,21 +152,19 @@ public class DbCreator : ContextUtils {
 	}
 	
 	private void EnsureDbFileCreated() {
-		string appData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-		string directory = Path.Join(appData, "Legatobase");
-		string dbFilePath = Path.Join(directory, "legatobase.db");
-		
-		if (File.Exists(dbFilePath)) {
+		if (File.Exists(this._dbPath)) {
+			Logger.Success("Database file exists", this._dbPath);
 			Logger.Success("Database file exists at " + dbFilePath);
 			this.DbPath = dbFilePath;
 			return;
 		} 
 		
-		this.MaybeCreateDirectory(directory);
+		this.MaybeCreateDirectory(Config.GetWindowsAppDataDirectory());
+		
 		try {
 			Logger.Info("Creating database file at " + dbFilePath);
-			File.WriteAllBytes(dbFilePath, Array.Empty<byte>());
-			if (File.Exists(dbFilePath)) {
+			File.WriteAllBytes(this._dbPath, Array.Empty<byte>());
+			if (File.Exists(this._dbPath)) {
 				Logger.Success($"Created  database file at {dbFilePath}");
 				return;
 			}
