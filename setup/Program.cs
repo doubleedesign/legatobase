@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Text;
 using Legatobase.Common;
 using Spectre.Console;
@@ -8,7 +8,8 @@ namespace Legatobase.Setup;
 class Program {
 	static void Main(string[] args) {
 		Console.OutputEncoding = Encoding.UTF8;
-		var db = EnsureDbExists();
+		Logger.Info("Legatobase version", Config.GetVersion());
+		EnsureDbExists();
 		
 		// Prompt for next action
 		var action = AnsiConsole.Prompt(
@@ -21,7 +22,7 @@ class Program {
 				Import();
 				break;
 			case "Regenerate EF Core classes":
-				RegenerateClasses(db.GetDbPath());
+				RegenerateClasses(Config.GetDbPath());
 				break;
 			default:
 				Environment.Exit(0);
@@ -29,11 +30,8 @@ class Program {
 		}
 	}
 
-	private static DbCreator EnsureDbExists() {
-		var db = new DbCreator();
-		db.Create();
-		
-		return db;
+	private static void EnsureDbExists() {
+		new DbCreator().Create();
 	}
 
 	static void Import() {
