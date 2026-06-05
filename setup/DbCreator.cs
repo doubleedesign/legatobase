@@ -109,17 +109,17 @@ public class DbCreator {
 		foreach (var (tableName, sql) in tables) {
 			try {
 				if(this.TableExists(tableName, connection)) {
-					Logger.Success($"Table {tableName} exists");
+					Logger.Success("Table exists", tableName);
 					continue;
 				}
 				
-				Logger.Info($"Creating table {tableName}");
+				Logger.Info("Creating table", tableName);
 				using var cmd = connection.CreateCommand();
 				cmd.CommandText = sql;
 				cmd.ExecuteNonQuery();
 				
 				if(this.TableExists(tableName, connection)) {
-					Logger.Success($"Created table {tableName}");
+					Logger.Success("Created table", tableName);
 				}
 				else {
 					throw new Exception($"Failed to create table {tableName}");
@@ -154,22 +154,20 @@ public class DbCreator {
 	private void EnsureDbFileCreated() {
 		if (File.Exists(this._dbPath)) {
 			Logger.Success("Database file exists", this._dbPath);
-			Logger.Success("Database file exists at " + dbFilePath);
-			this.DbPath = dbFilePath;
 			return;
 		} 
 		
 		this.MaybeCreateDirectory(Config.GetWindowsAppDataDirectory());
 		
 		try {
-			Logger.Info("Creating database file at " + dbFilePath);
+			Logger.Info("Creating database file", this._dbPath);
 			File.WriteAllBytes(this._dbPath, Array.Empty<byte>());
 			if (File.Exists(this._dbPath)) {
-				Logger.Success($"Created  database file at {dbFilePath}");
+				Logger.Success("Created database file", this._dbPath);
 				return;
 			}
 			
-			throw new Exception("Failed to create database file at " + dbFilePath);
+			throw new Exception("Failed to create database file at " + this._dbPath);
 		}
 		catch (Exception e) {
 			Logger.Error(e.Message);
@@ -179,15 +177,15 @@ public class DbCreator {
 	
 	private void MaybeCreateDirectory(string dirPath) {
 		if (Directory.Exists(dirPath)) {
-			Logger.Success($"Directory exists at {dirPath}");
+			Logger.Success("Directory exists", dirPath);
 			return;
 		}
 		
-		Logger.Info("Creating directory at " + dirPath);
+		Logger.Info("Creating directory", dirPath);
 		try {
 			Directory.CreateDirectory(dirPath);
 			if(Directory.Exists(dirPath)) {
-				Logger.Success("Created directory at " + dirPath);
+				Logger.Success("Created directory", dirPath);
 			}
 			else {
 				throw new DirectoryNotFoundException();
