@@ -96,6 +96,7 @@ class Program {
 	static void EnterCredentials() {
 		var discogs = Config.GetCredential("Discogs");
 		if (discogs == null) {
+			Logger.Info("Get your Discogs credentials from: https://www.discogs.com/settings/developers");
 			string discogsConsumerKey = Logger.Input("Enter your Discogs  consumer key:");
 			string discogsConsumerSecret = Logger.Input("Enter your Discogs consumer secret:");
 			Config.SetCredential("Discogs", discogsConsumerKey, discogsConsumerSecret);

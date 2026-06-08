@@ -1,9 +1,8 @@
-using System.Net;
+using System.Text.Json.Nodes;
 using Legatobase.Common;
-
 namespace Legatobase.API.Datasources;
 
-public class DiscogsConnector : ExternalApiConnector {
+public class DiscogsConnector : ExternalApiConnector, IExternalApi {
 	
 	public DiscogsConnector() : base("https://api.discogs.com", GetAuthHeaders()) { }
 
@@ -19,12 +18,56 @@ public class DiscogsConnector : ExternalApiConnector {
 		};
 	}
 
-	public async Task<HttpResponseMessage> Search(string entityType, string searchTerm) {
+	public async Task<JsonObject> Search(string entityType, string searchTerm) {
 		var args = new Dictionary<string, string> {
-			{ "q", Uri.EscapeDataString(searchTerm) },
-			{ "type", entityType.ToLower() }
+			{ "q", searchTerm.Trim() }, // do not escape the string here, it causes double-escaping and thus unexpected results
+			{ "type", entityType.ToLower().Trim() }
 		};
 
-		return await this.Get("database/search", args);
+		var results = (await this.Get("database/search", args)).Pick(["results"]);
+		if (results == null) {
+			throw new KeyNotFoundException($"No results found in Discogs search for \"{searchTerm}\"");
+		}
+
+		var firstResult = results.First().Value?.AsArray().First() ?? null;
+		if (firstResult == null) {
+			throw new KeyNotFoundException($"No results found in Discogs search for \"{searchTerm}\"");
+		}
+
+		return firstResult.AsObject();
+	}
+
+
+	public async Task<SimpleDataObject> GetArtistByName(string name) {
+		JsonObject searchResult = await this.Search("artist", name);
+
+		var returnedName = searchResult["title"]?.GetValue<string>();
+		var returnedId = searchResult["id"]?.GetValue<int>();
+		if (returnedName is null || !string.Equals(name, returnedName, StringComparison.OrdinalIgnoreCase)) {
+			throw new KeyNotFoundException($"Artist \"{name}\" not found in Discogs search, or was not the first result");
+		}
+
+		if (returnedId is null) {
+			throw new KeyNotFoundException($"ID for artist \"{name}\" not found in Discogs search");
+		}
+
+		SimpleDataObject result = new SimpleDataObject {
+			{ "Name", returnedName },
+			{ "DID", (int)returnedId },
+		};
+
+		try {
+			JsonObject profileResult = await this.Get($"artists/{returnedId}");
+			var profileText = profileResult["profile"]?.GetValue<string>() ?? "";
+			result.Add("Profile", profileText);
+			
+			// TODO: This search query also gets groups (e.g., searching for Stevie Nicks will get you Fleetwood Mac.
+			//		 Could be a good way to handle associating individuals to groups.
+		}
+		catch (HttpRequestException e) {
+			Logger.Warning($"Error {e.StatusCode.ToString()}", $"Failed to get profile for artist \"{name}\" with ID {returnedId} from Discogs API. Error message: {e.Message}");
+		}
+
+		return result;
 	}
 }

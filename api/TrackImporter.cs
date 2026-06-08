@@ -4,14 +4,12 @@ using OneOf;
 
 namespace Legatobase.API;
 
-using TrackData = Dictionary<string, OneOf<string, int>>;
-
 public class TrackImporter : Importer {
 	
 	public TrackImporter(LbContext db) : base(db) {
 	}
 
-	// public Track? Import(TrackData data) {
+	// public Track? Import(SimpleDataObject data) {
 	// 	data.TryGetValue("Title", out var title);
 	// 	if (title.IsNull()) {
 	// 		throw new Exception("Cannot import track without a title.");
