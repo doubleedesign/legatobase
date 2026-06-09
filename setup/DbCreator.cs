@@ -51,16 +51,21 @@ public class DbCreator {
     		)",
 			
 			["Artists"] = @"CREATE TABLE IF NOT EXISTS Artists(
-    			Id			INTEGER PRIMARY KEY AUTOINCREMENT,
-				Name 		VARCHAR	NOT NULL,
-				MBID 		VARCHAR,
-				DID 		VARCHAR,
-				Profile 	TEXT,
-				Home 		VARCHAR,
-				Country 	VARCHAR,
-				Birthdate 	DATETIME,
-				Deathdate 	DATETIME
+    			Id				INTEGER PRIMARY KEY AUTOINCREMENT,
+				Name 			VARCHAR	NOT NULL,
+				MBID 			VARCHAR,
+				DID 			VARCHAR,
+				Profile 		TEXT,
+				Hometown 		VARCHAR,
+				Country 		VARCHAR,
+				BirthDate 		DATETIME,
+				DeathDate 		DATETIME,
+				Disambiguation	TEXT
 			)",	
+			// TODO: Disambiguations can be fetched from multiple APIs, which to prioritise?
+			// TODO: How to model supertype of "Artist" and subtypes for individuals and groups
+			// Individuals have Hometown, BirthDate, and DeathDate
+			// Groups have Origin, FoundedDate, and EndedDate
 			
 			["ArtistGroups"] = @"CREATE TABLE IF NOT EXISTS ArtistGroups(
 			    ArtistId 	INTEGER NOT NULL,

@@ -29,6 +29,7 @@ public class DiscogsConnector : ExternalApiConnector, IExternalApi {
 			throw new KeyNotFoundException($"No results found in Discogs search for \"{searchTerm}\"");
 		}
 
+		// FIXME: This assumes the first result will be the correct one - it should probably keep going if not
 		var firstResult = results.First().Value?.AsArray().First() ?? null;
 		if (firstResult == null) {
 			throw new KeyNotFoundException($"No results found in Discogs search for \"{searchTerm}\"");
@@ -46,7 +47,6 @@ public class DiscogsConnector : ExternalApiConnector, IExternalApi {
 		if (returnedName is null || !string.Equals(name, returnedName, StringComparison.OrdinalIgnoreCase)) {
 			throw new KeyNotFoundException($"Artist \"{name}\" not found in Discogs search, or was not the first result");
 		}
-
 		if (returnedId is null) {
 			throw new KeyNotFoundException($"ID for artist \"{name}\" not found in Discogs search");
 		}
