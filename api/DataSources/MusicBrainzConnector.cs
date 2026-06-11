@@ -31,35 +31,38 @@ public class MusicBrainzConnector : ExternalApiConnector, IExternalApi {
 		return await base.Get(path, updatedQueryParams, headers);
 	}
 	
-	public async Task<JsonObject> GetByMbid(string entityType, string mbid) {
+	public async Task<SimpleDataObject> GetByMbid(string entityType, string mbid) {
 		// TODO: Some kind of reusable formatter that ensures getting something by MBID returns the same data as its dedicated GetBy/search
-		return await this.Get($"{entityType.Trim()}/{mbid.Trim()}");
+		var result = await this.Get($"{entityType.Trim()}/{mbid.Trim()}");
+		
+		return this.MapArtistData(result);
 	}
 	
 	public async Task<SimpleDataObject> GetArtistByName(string name) {
 		JsonObject searchResult = await this.Search("artist", name.Trim());
-
-		var returnedName = searchResult["title"]?.GetValue<string>();
+		var returnedName = searchResult["name"]?.GetValue<string>();
 		var returnedId = searchResult["id"]?.GetValue<string>();
 		if (returnedName is null || !string.Equals(name, returnedName, StringComparison.OrdinalIgnoreCase)) {
-			throw new KeyNotFoundException($"Artist \"{name}\" not found in Discogs search, or was not the first result");
+			throw new KeyNotFoundException($"Artist \"{name}\" not found in Musicbrainz search, or was not the first result");
 		}
 		if (returnedId is null) {
-			throw new KeyNotFoundException($"ID for artist \"{name}\" not found in Discogs search");
+			throw new KeyNotFoundException($"ID for artist \"{name}\" not found in Musicbrainz search");
 		}
 		
-		SimpleDataObject result = new SimpleDataObject {
-			{ "Name", returnedName },
-			{ "MBID", returnedId },
+		return this.MapArtistData(searchResult);
+	}
+
+	private SimpleDataObject MapArtistData(JsonObject data) {
+		return new SimpleDataObject {
+			{ "Name",  data["name"]?.GetValue<string>() },
+			{ "MBID", data["id"]?.GetValue<string>() },
 			// TODO: Hometown should be Origin for groups
-			{ "Hometown", searchResult["begin-area"]?["name"]?.GetValue<string>() ?? null },
-			{ "Country", searchResult["area"]?["country"]?.GetValue<string>() ?? null },
+			{ "Hometown", data["begin-area"]?["name"]?.GetValue<string>() ?? null },
+			{ "Country", data["country"]?.GetValue<string>() ?? null },
 			// TODO: These need to be datetimes, and are also for individuals only
-			{ "BirthDate", searchResult["life-span"]?["begin"]?.GetValue<string>() ?? null },
-			{ "DeathDate", searchResult["life-span"]?["end"]?.GetValue<string>() ?? null },
+			{ "BirthDate", data["life-span"]?["begin"]?.GetValue<string>() ?? null },
+			{ "DeathDate", data["life-span"]?["end"]?.GetValue<string>() ?? null },
 			// TODO: FoundedDate and EndedDate for groups only (also need to be added to db)
 		};
-
-		return result;
 	}
 }

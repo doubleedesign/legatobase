@@ -15,8 +15,8 @@ public class MusicBrainzConnectorTests {
 	
 		Assert.Equal("faabb55d-3c9e-4c23-8779-732ac2ee2c0d", result["MBID"]);
 		Assert.Equal("Shania Twain", result["Name"]);
-		Assert.Equal("Canada", result["Country"]);
-		Assert.Equal("BirthDate", result["1965-08-28"]);
+		Assert.Equal("CA", result["Country"]);
+		Assert.Equal("1965-08-28", result["BirthDate"]);
 	}
 	
 		
@@ -25,7 +25,7 @@ public class MusicBrainzConnectorTests {
 		var result = await this.instance.GetByMbid("artist", "faabb55d-3c9e-4c23-8779-732ac2ee2c0d");
 	
 		Assert.Equal("Shania Twain", result["Name"]);
-		Assert.Equal("Canada", result["Country"]);
-		Assert.Equal("BirthDate", result["1965-08-28"]);
+		Assert.Equal("CA", result["Country"]);
+		Assert.Equal("1965-08-28", result["BirthDate"]);
 	}
 }
