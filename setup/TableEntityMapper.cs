@@ -14,6 +14,7 @@ public class TableEntityMapper : IPluralizer {
 	public string Singularize(string name) {
 		if (name == "ArtistsTracks") return "ArtistTrackConnection";
 		if (name == "AlbumsTracks") return "AlbumTrackConnection";
+		if (name == "ArtistsGroups") return "ArtistGroupConnection";
 
 		return name.Singularize();
 	}

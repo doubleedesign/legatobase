@@ -1,7 +1,7 @@
-using Microsoft.EntityFrameworkCore;
+using Legatobase.Common;
 using Legatobase.Core;
-
-namespace Legatobase.Common;
+using Microsoft.EntityFrameworkCore;
+namespace Legatobase.API;
 
 public class LbContext(DbContextOptions<LbContextBase> options) : LbContextBase(options) {
 	

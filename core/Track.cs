@@ -17,9 +17,9 @@ public partial class Track
 
     public string? Iswc { get; set; }
 
-    public int? ShsId { get; set; }
-
     public string? Mbid { get; set; }
+
+    public int? ShsId { get; set; }
 
     public int? PlayCount { get; set; }
 

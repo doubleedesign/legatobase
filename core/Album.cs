@@ -9,11 +9,13 @@ public partial class Album
 
     public string Title { get; set; } = null!;
 
-    public int ArtistId { get; set; }
+    public int ReleaseArtistId { get; set; }
 
     public int? Year { get; set; }
 
     public string? Barcode { get; set; }
+
+    public string? ReleaseGroupId { get; set; }
 
     public string? MasterId { get; set; }
 
@@ -21,5 +23,5 @@ public partial class Album
 
     public int? ExternalPlaycount { get; set; }
 
-    public virtual Artist Artist { get; set; } = null!;
+    public virtual Artist ReleaseArtist { get; set; } = null!;
 }

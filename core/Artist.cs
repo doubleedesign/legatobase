@@ -15,13 +15,17 @@ public partial class Artist
 
     public string? Profile { get; set; }
 
-    public string? Home { get; set; }
+    public string? Hometown { get; set; }
 
     public string? Country { get; set; }
 
-    public DateTime? Birthdate { get; set; }
+    public DateTime? BirthDate { get; set; }
 
-    public DateTime? Deathdate { get; set; }
+    public DateTime? DeathDate { get; set; }
 
     public virtual ICollection<Album> Albums { get; set; } = new List<Album>();
+
+    public virtual Group? Group { get; set; }
+
+    public virtual Person? Person { get; set; }
 }

@@ -1,4 +1,3 @@
-using Legatobase.API;
 using Legatobase.Common;
 using Microsoft.Data.Sqlite;
 
@@ -22,19 +21,19 @@ public class DbCreator {
 	private void CreateTables(SqliteConnection connection) {
 		var tables = new Dictionary<string, string> {
 			["Genres"] = @"CREATE TABLE IF NOT EXISTS Genres (
-				Id		INTEGER PRIMARY KEY AUTOINCREMENT,
+				Id		INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
 				Label	VARCHAR	NOT NULL
 			)",
 
 			["Tracks"] = @"CREATE TABLE IF NOT EXISTS Tracks (
-				Id				INTEGER PRIMARY KEY AUTOINCREMENT,
+				Id				INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
 				Title			VARCHAR	NOT NULL,
 				Year			INTEGER,
 				GenreId 		INTEGER,
 				ISRC 			VARCHAR,
 				ISWC 			VARCHAR,
-				SHS_ID 			INTEGER,
 				MBID 			VARCHAR,
+				SHS_ID 			INTEGER,
 				PlayCount		INTEGER,
 				FileLocation 	VARCHAR,
 				FileSize 		INTEGER,
@@ -46,58 +45,72 @@ public class DbCreator {
 			)",
 			
 			["FileTypes"] = @"CREATE TABLE IF NOT EXISTS FileTypes (
-    			Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    			Id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
     			Label VARCHAR NOT NULL
     		)",
 			
 			["Artists"] = @"CREATE TABLE IF NOT EXISTS Artists(
-    			Id				INTEGER PRIMARY KEY AUTOINCREMENT,
+    			Id				INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
 				Name 			VARCHAR	NOT NULL,
 				MBID 			VARCHAR,
 				DID 			VARCHAR,
 				Profile 		TEXT,
 				Hometown 		VARCHAR,
 				Country 		VARCHAR,
-				BirthDate 		DATETIME,
-				DeathDate 		DATETIME,
-				Disambiguation	TEXT
+				BirthDate 		DATE,
+				DeathDate 		DATE
 			)",	
-			// TODO: Disambiguations can be fetched from multiple APIs, which to prioritise?
-			// TODO: How to model supertype of "Artist" and subtypes for individuals and groups
-			// Individuals have Hometown, BirthDate, and DeathDate
-			// Groups have Origin, FoundedDate, and EndedDate
+
+			["Groups"] = @"CREATE TABLE IF NOT EXISTS Groups(
+    			Id				INTEGER PRIMARY KEY UNIQUE NOT NULL,
+    			Origin			VARCHAR,
+    			FoundedDate 	DATE,
+    			EndedDate		DATE,
+    			FOREIGN KEY (Id) REFERENCES Artists(Id)
+    		)",
 			
-			["ArtistGroups"] = @"CREATE TABLE IF NOT EXISTS ArtistGroups(
-			    ArtistId 	INTEGER NOT NULL,
-			    GroupId 	INTEGER NOT NULL,
+			["People"] = @"CREATE TABLE IF NOT EXISTS People(
+				Id				INTEGER PRIMARY KEY UNIQUE NOT NULL,
+				Hometown 		VARCHAR,
+				BirthDate 		VARCHAR,
+				DeathDate 		VARCHAR,
+				FOREIGN KEY (Id) REFERENCES Artists(Id)
+			)",
+			
+			["Artists_Groups"] = @"CREATE TABLE IF NOT EXISTS ArtistsGroups(
+			    ArtistId 		INTEGER NOT NULL,
+			    GroupId 		INTEGER NOT NULL,
+			    MembershipStart	VARCHAR,
+			    MembershipEnd	VARCHAR,
 			    FOREIGN KEY (ArtistId) REFERENCES Artists(Id),
 			    FOREIGN KEY (GroupId) REFERENCES Artists(Id)
 			)",
 			
 			["Albums"] = @"CREATE TABLE IF NOT EXISTS Albums(
-    			Id 			INTEGER PRIMARY KEY AUTOINCREMENT,
-    			Title  		VARCHAR NOT NULL,
-    			ArtistId  	INTEGER NOT NULL,
-    			Year 		INTEGER,
-    			Barcode 	VARCHAR,
-    			MasterId 	VARCHAR,
-    			MBID 		VARCHAR,
-    			external_playcount INTEGER,
-    			FOREIGN KEY (ArtistId) REFERENCES Artists(Id)
+    			Id 					INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+    			Title  				VARCHAR NOT NULL,
+    			ReleaseArtistId  	INTEGER NOT NULL,
+    			Year 				INTEGER,
+    			Barcode 			VARCHAR,
+    			ReleaseGroupId		VARCHAR, /* Musicbrainz */
+    			MasterId 			VARCHAR, /* Discogs */
+    			MBID 				VARCHAR,
+    			external_playcount 	INTEGER,
+    			FOREIGN KEY (ReleaseArtistId) REFERENCES Artists(Id)
 			)",
 			
-			["ArtistTypes"] = @"CREATE TABLE IF NOT EXISTS ArtistTypes(
-    			Id		INTEGER PRIMARY KEY AUTOINCREMENT,
+			["Roles"] = @"CREATE TABLE IF NOT EXISTS Roles(
+    			Id		INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
     			Label 	VARCHAR	NOT NULL
     		)",
 			
 			["Artists_Tracks"] = @"CREATE TABLE IF NOT EXISTS Artists_Tracks(
     			TrackId 		INTEGER NOT NULL,
     			ArtistId		INTEGER NOT NULL,
-    			AristTypeId 	INTEGER NOT NULL,
+    			RoleId			INTEGER NOT NULL,
     			FOREIGN KEY (TrackId) REFERENCES Tracks(Id),
     			FOREIGN KEY (ArtistId) REFERENCES Artists(Id),
-				FOREIGN KEY (AristTypeId) REFERENCES ArtistTypes(Id)
+				FOREIGN KEY (RoleId) REFERENCES Roles(Id)
 			)",
 			
 			["Albums_Tracks"] = @"CREATE TABLE IF NOT EXISTS Albums_Tracks(

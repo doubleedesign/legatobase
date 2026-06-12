@@ -9,11 +9,11 @@ public partial class ArtistTrackConnection
 
     public int ArtistId { get; set; }
 
-    public int AristTypeId { get; set; }
-
-    public virtual ArtistType AristType { get; set; } = null!;
+    public int RoleId { get; set; }
 
     public virtual Artist Artist { get; set; } = null!;
+
+    public virtual Role Role { get; set; } = null!;
 
     public virtual Track Track { get; set; } = null!;
 }
