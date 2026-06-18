@@ -32,9 +32,9 @@ public class MusicBrainzConnector : ExternalApiConnector, IExternalApi {
 	}
 	
 	public async Task<SimpleDataObject> GetByMbid(string entityType, string mbid) {
-		// TODO: Some kind of reusable formatter that ensures getting something by MBID returns the same data as its dedicated GetBy/search
 		var result = await this.Get($"{entityType.Trim()}/{mbid.Trim()}");
 		
+		// TODO This needs to handle other entity types in a similar way
 		return this.MapArtistData(result);
 	}
 	
@@ -50,6 +50,10 @@ public class MusicBrainzConnector : ExternalApiConnector, IExternalApi {
 		}
 		
 		return this.MapArtistData(searchResult);
+	}
+
+	public Task<List<SimpleDataObject>> GetReleasesByBarcode(string barcode) {
+		throw new NotImplementedException();
 	}
 
 	private SimpleDataObject MapArtistData(JsonObject data) {

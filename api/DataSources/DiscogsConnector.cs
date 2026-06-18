@@ -70,4 +70,8 @@ public class DiscogsConnector : ExternalApiConnector, IExternalApi {
 
 		return result;
 	}
+	
+	public Task<List<SimpleDataObject>> GetReleasesByBarcode(string barcode) {
+		throw new NotImplementedException();
+	}
 }

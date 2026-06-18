@@ -16,11 +16,28 @@ class Program {
 		var action = AnsiConsole.Prompt(
 			new SelectionPrompt<string>()
 				.Title("What would you like to do?")
-				.AddChoices("Import iTunes library", "Regenerate EF Core classes", "Exit"));
+				.AddChoices(
+					"Import release by barcode", 
+					"Import release from folder", 
+					"Import single track from file",
+					"Import discography of artist",
+					"Regenerate EF Core classes", 
+					"Exit"
+				)
+			);
 
 		switch (action) {
-			case "Import iTunes library":
-				Import();
+			case "Import release by barcode":
+				ImportByBarcode();
+				break;
+			case "Import release from folder":
+				ImportFromFolder();
+				break;
+			case "Import single track from file":
+				ImportSingleTrack();
+				break;
+			case "Import discography of artist":
+				ImportByArtist();
 				break;
 			case "Regenerate EF Core classes":
 				RegenerateClasses(Config.GetDbPath());
@@ -31,19 +48,24 @@ class Program {
 		}
 	}
 
-	private static void EnsureDbExists() {
-		new DbCreator().Create();
+	private static void ImportByBarcode() {
+		throw new NotImplementedException();
 	}
 
-	static void Import() {
-		var filePath = "C:/Users/leesa/Desktop/Library-2026-05-23.xml"; // FIXME: This is temporary, remove it
-		
-		while (string.IsNullOrEmpty(filePath)) {
-			filePath = Logger.Input("Enter the path to your iTunes library XML file:");
-		}
-		
-		var importer = new ITunesImporter(filePath);
-		importer.Import();
+	private static void ImportFromFolder() {
+		throw new NotImplementedException();
+	}
+
+	private static void ImportSingleTrack() {
+		throw new NotImplementedException();
+	}
+
+	private static void ImportByArtist() {
+		throw new NotImplementedException();
+	}
+
+	private static void EnsureDbExists() {
+		new DbCreator().Create();
 	}
 
 	static void RegenerateClasses(string dbFilePath) {

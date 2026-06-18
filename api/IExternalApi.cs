@@ -10,4 +10,8 @@ public interface IExternalApi {
 	public Task<JsonObject> Search(string entityType, string searchTerm);
 	
 	public Task<SimpleDataObject> GetArtistByName(string name);
+	
+	public Task<List<SimpleDataObject>> GetReleasesByBarcode(string barcode);
+	
+	
 }
