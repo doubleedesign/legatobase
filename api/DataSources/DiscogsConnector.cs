@@ -29,7 +29,18 @@ public class DiscogsConnector : ExternalApiConnector, IExternalApi {
 			throw new KeyNotFoundException($"No results found in Discogs search for \"{searchTerm}\"");
 		}
 
-		// FIXME: This assumes the first result will be the correct one - it should probably keep going if not
+		return results;
+	}
+
+	/// <summary>
+	/// Run a search and return the first result. For use when we're confident the first result will be the correct one.
+	/// </summary>
+	/// <param name="entityType"></param>
+	/// <param name="searchTerm"></param>
+	/// <returns></returns>
+	/// <exception cref="KeyNotFoundException"></exception>
+	public async Task<JsonObject> SearchOne(string entityType, string searchTerm) {
+		var results = await this.Search(entityType, searchTerm);
 		var firstResult = results.First().Value?.AsArray().First() ?? null;
 		if (firstResult == null) {
 			throw new KeyNotFoundException($"No results found in Discogs search for \"{searchTerm}\"");
@@ -38,9 +49,8 @@ public class DiscogsConnector : ExternalApiConnector, IExternalApi {
 		return firstResult.AsObject();
 	}
 
-
 	public async Task<SimpleDataObject> GetArtistByName(string name) {
-		JsonObject searchResult = await this.Search("artist", name);
+		JsonObject searchResult = await this.SearchOne("artist", name);
 
 		var returnedName = searchResult["title"]?.GetValue<string>();
 		var returnedId = searchResult["id"]?.GetValue<int>();
@@ -71,7 +81,32 @@ public class DiscogsConnector : ExternalApiConnector, IExternalApi {
 		return result;
 	}
 	
-	public Task<List<SimpleDataObject>> GetReleasesByBarcode(string barcode) {
-		throw new NotImplementedException();
+	public async Task<List<ReleaseSearchResult>> GetReleasesByBarcode(string barcode) {
+		JsonObject searchResult = await this.Search("release", barcode);
+		JsonArray? rawItems = searchResult["results"]?.AsArray();
+		if (rawItems == null) {
+			return [];
+		}
+		
+		var results = new List<ReleaseSearchResult>();
+		foreach (var rawItem in rawItems) {
+			var rawTitle = rawItem["title"]?.GetValue<string>();
+			if (rawTitle is null) {
+				continue;
+			}
+			
+			// Split the rawTitle at the "-"
+			var pieces = rawTitle.Split('-');
+			var artist = pieces[0].Trim();
+			var actualTitle = pieces[1].Trim();
+			
+			results.Add(new ReleaseSearchResult {
+				Title = actualTitle,
+				ReleaseArtist = artist,
+				IdOnSourcePlatform = rawItem["id"]?.GetValue<int>().ToString() ?? ""
+			});
+		}
+
+		return results;
 	}
 }

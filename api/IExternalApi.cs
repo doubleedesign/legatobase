@@ -11,7 +11,7 @@ public interface IExternalApi {
 	
 	public Task<SimpleDataObject> GetArtistByName(string name);
 	
-	public Task<List<SimpleDataObject>> GetReleasesByBarcode(string barcode);
+	public Task<List<ReleaseSearchResult>> GetReleasesByBarcode(string barcode);
 	
 	
 }

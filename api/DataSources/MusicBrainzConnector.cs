@@ -11,11 +11,21 @@ public class MusicBrainzConnector : ExternalApiConnector, IExternalApi {
 
 	public async Task<JsonObject> Search(string entityType, string searchTerm) {
 		var args = new Dictionary<string, string> {
-			{ "query", Uri.EscapeDataString(searchTerm).Trim() },
-			{ "limit", 1.ToString() }
+			{ "query", Uri.EscapeDataString(searchTerm).Trim() }
 		};
 
-		JsonObject results = await this.Get(entityType.ToLower(), args);
+		return await this.Get(entityType.ToLower(), args);
+	}
+
+	/// <summary>
+	/// Run a search and return the first result. For use when we're confident the first result will be the correct one.
+	/// </summary>
+	/// <param name="entityType"></param>
+	/// <param name="searchTerm"></param>
+	/// <returns></returns>
+	/// <exception cref="KeyNotFoundException"></exception>
+	private async Task<JsonObject> SearchOne(string entityType, string searchTerm) {
+		var results = await this.Search(entityType, searchTerm);
 		var firstResult = results[entityType.ToLower().Pluralize()]?.AsArray().First();
 		if (firstResult == null) {
 			throw new KeyNotFoundException($"No results found in MusicBrainz search for \"{searchTerm}\"");
@@ -23,7 +33,7 @@ public class MusicBrainzConnector : ExternalApiConnector, IExternalApi {
 		
 		return firstResult.AsObject();
 	}
-	
+
 	private new async Task<JsonObject> Get(string path, Dictionary<string, string>? queryParams = null, Dictionary<string, string>? headers = null) {
 		var updatedQueryParams = queryParams ?? new Dictionary<string, string>();
 		updatedQueryParams.Add("fmt", "json");
@@ -39,7 +49,7 @@ public class MusicBrainzConnector : ExternalApiConnector, IExternalApi {
 	}
 	
 	public async Task<SimpleDataObject> GetArtistByName(string name) {
-		JsonObject searchResult = await this.Search("artist", name.Trim());
+		JsonObject searchResult = await this.SearchOne("artist", name.Trim());
 		var returnedName = searchResult["name"]?.GetValue<string>();
 		var returnedId = searchResult["id"]?.GetValue<string>();
 		if (returnedName is null || !string.Equals(name, returnedName, StringComparison.OrdinalIgnoreCase)) {
@@ -52,8 +62,23 @@ public class MusicBrainzConnector : ExternalApiConnector, IExternalApi {
 		return this.MapArtistData(searchResult);
 	}
 
-	public Task<List<SimpleDataObject>> GetReleasesByBarcode(string barcode) {
-		throw new NotImplementedException();
+	public async Task<List<ReleaseSearchResult>> GetReleasesByBarcode(string barcode) {
+		JsonObject searchResult = await this.Search("release", barcode);
+		JsonArray? rawItems = searchResult["releases"]?.AsArray();
+		if (rawItems == null) {
+			return [];
+		}
+		
+		List<ReleaseSearchResult> results = [];
+		foreach (var rawItem in rawItems) {
+			results.Add(new ReleaseSearchResult {
+				Title = rawItem!["title"]?.GetValue<string>() ?? "",
+				ReleaseArtist = rawItem["artist-credit"]?[0]?["name"]?.GetValue<string>() ?? "",
+				IdOnSourcePlatform = rawItem["id"]?.GetValue<string>() ?? ""
+			});
+		}
+		
+		return results;
 	}
 
 	private SimpleDataObject MapArtistData(JsonObject data) {

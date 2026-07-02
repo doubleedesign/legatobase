@@ -21,4 +21,11 @@ public class DiscogsConnectorTests {
 		Assert.Equal(130060, result["DID"]);
 		Assert.False(string.IsNullOrWhiteSpace(result["Profile"].AsString()));
 	}
+	
+	[Fact]
+	public async Task GetReleasesByBarcode() {
+		var result = await this.instance.GetReleasesByBarcode("731452823328");
+		
+		Assert.Contains(result, r => r.Title.Contains("Come On Over", StringComparison.OrdinalIgnoreCase) && r.ReleaseArtist == "Shania Twain");
+	}
 }
