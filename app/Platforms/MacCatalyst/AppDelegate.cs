@@ -1,6 +1,6 @@
 ﻿using Foundation;
 
-namespace app;
+namespace Legatobase.App;
 
 [Register("AppDelegate")]
 public class AppDelegate : MauiUIApplicationDelegate {

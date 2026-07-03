@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace app;
+namespace Legatobase.App;
 
 public static class MauiProgram {
 	public static MauiApp CreateMauiApp() {

@@ -1,4 +1,4 @@
-﻿namespace app;
+﻿namespace Legatobase.App;
 
 public partial class MainPage : ContentPage {
 	public MainPage() {

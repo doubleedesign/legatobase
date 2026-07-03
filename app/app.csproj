@@ -1,6 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
+        <Title>Legatobase</Title>
+        <Authors>Leesa Ward</Authors>
+        <PackageProjectUrl>https://legatobase.app</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/doubleedesign/legatobase</RepositoryUrl>
+        <NeutralLanguage>en-AU</NeutralLanguage>
+        
         <TargetFrameworks>net10.0-android</TargetFrameworks>
         <TargetFrameworks Condition="!$([MSBuild]::IsOSPlatform('linux'))">$(TargetFrameworks);net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
         <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.19041.0</TargetFrameworks>
@@ -11,14 +17,15 @@
             The Mac App Store will NOT accept apps with ONLY maccatalyst-arm64 indicated;
             either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
         <!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
-
         <OutputType>Exe</OutputType>
-        <RootNamespace>app</RootNamespace>
+        <AssemblyName>Legatobase.App</AssemblyName>
+        <RootNamespace>Legatobase.App</RootNamespace>
         <UseMaui>true</UseMaui>
         <SingleProject>true</SingleProject>
         <ImplicitUsings>enable</ImplicitUsings>
         <EnableDefaultCssItems>false</EnableDefaultCssItems>
         <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
 
         <!-- Enable XAML source generation for faster build times and improved performance.
              This generates C# code from XAML at compile time instead of runtime inflation.
@@ -29,13 +36,13 @@
         <MauiXamlInflator>SourceGen</MauiXamlInflator>
 
         <!-- Display name -->
-        <ApplicationTitle>app</ApplicationTitle>
+        <ApplicationTitle>Legatobase</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.companyname.app</ApplicationId>
+        <ApplicationId>com.doubleedesign.legatobase</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+        <ApplicationDisplayVersion>0.0.1</ApplicationDisplayVersion>
         <ApplicationVersion>1</ApplicationVersion>
 
         <!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
@@ -46,6 +53,7 @@
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+        
     </PropertyGroup>
 
     <ItemGroup>

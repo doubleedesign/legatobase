@@ -1,4 +1,4 @@
-﻿namespace app;
+namespace Legatobase.App;
 
 public partial class App : Application {
 	public App() {
@@ -6,6 +6,6 @@ public partial class App : Application {
 	}
 
 	protected override Window CreateWindow(IActivationState? activationState) {
-		return new Window(new MainPage()) { Title = "app" };
+		return new Window(new MainPage()) { Title = "Legatobase" };
 	}
 }
