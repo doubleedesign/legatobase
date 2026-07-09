@@ -20,6 +20,7 @@ Instructions to come when the app is actually ready for general use.
 
 - [Prerequisites](#prerequisites)
 - [Rider setup](#rider-setup)
+  - [General stuff](#general-stuff)
   - [.NET stuff](#net-stuff)
   - [Android stuff](#android-stuff)
 - [Project structure](#project-structure)
@@ -41,13 +42,16 @@ The instructions below are written per my preferred environment and tooling:
 - A .NET IDE, e.g., [Jetbrains Rider](https://www.jetbrains.com/rider/) or Visual Studio
 - Windows 11 SDK ([download](https://learn.microsoft.com/en-gb/windows/apps/windows-sdk/downloads))
 - Microsoft OpenJDK 21[^2] ([download](https://learn.microsoft.com/en-us/java/openjdk/download) or `choco install microsoft-openjdk-21`) and point Rider to it in Settings > Build, Execution, Deployment > Android
-- Android SDK - `choco install android-sdk` is recommended as this will set the required system environment variables for you[^3]
+- Android SDK - `choco install android-sdk` is recommended initially, as this will set the required system environment variables for you[^3]
 - [.NET MAUI CLI](https://learn.microsoft.com/en-us/dotnet/maui/developer-tools/cli/?view=net-maui-10.0) `dotnet tool install -g Microsoft.Maui.Cli --prerelease`
 
 [^2]: OpenJDK 21 is the newest version compatible with Android API level 36, which this project is set to target at the time of writing.
 [^3]: Alternatively, you can use Android Studio to install and manage the Android SDK and emulators, but I think it's overkill and kinda annoying to have an entire extra IDE installed just for that.
 
 ### Rider setup
+
+#### General stuff
+- In Settings > Tools > Terminal, ensure "Shell integration" is enabled, so all the settings for SDKs and whatnot in the IDE are used by the built-in terminal.
 
 #### .NET stuff
 - In Settings > Build, Execution, Deployment > Toolset and Build, ensure the path to your .NET executable is correct and that the latest MSBuild version is selected (matching the latest SDK version you have installed)
@@ -59,6 +63,7 @@ The instructions below are written per my preferred environment and tooling:
 #### Android stuff
 Go to Settings > Build, Execution, Deployment > Android and:
 - Set the path to your Android SDK installation; Chocolatey's default is `C:\Android\android-sdk`
+- Set the Android version to 14 (SDK 34) and follow the prompts to install it if needed (this is the newest version supported by the Sony Android Walkman NW-ZX707)
 - Set the path to your JDK installation; Chocolatey's default for Microsoft OpenJDK is `C:\Program Files\Microsoft\jdk-<version>` (it should pick it up and you can select it from the dropdown)
 - Go to Settings > Build, Execution, Deployment > Android > SDK Updater, and in the SDK Tools tab ensure the following are installed (and install them from there if not):
   - Android SDK Command-line Tools (latest)
@@ -72,35 +77,31 @@ Go to Settings > Build, Execution, Deployment > Android and:
 
 The solution is made up of multiple projects:
 
-| Project | Purpose                                                                                                                                                                                                                          |
-|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Setup   | Console app for database creation, regeneration of Entity Framework classes (if the database schema changes), and manually running some API functions via console.                                                               |
-| Core    | The auto-generated Entity Framework classes. Extra methods for objects should live in classes that extend these ones (in the appropriate other project) so they can easily be regenerated if the database schema changes.        |
-| Common  | Centralised configuration, utility classes, extension methods, etc.                                                                                                                                                              |
-| API     | The back-end code for handling importing and updating data, fetching data from third-party APIs, getting and transforming data from the database for display, etc.[^1]                                                           |
-| App     | Cross-platform [MAUI](https://dotnet.microsoft.com/en-us/apps/maui) / [Blazor hybrid](https://learn.microsoft.com/en-us/aspnet/core/blazor/hybrid/tutorials/maui?view=aspnetcore-10.0) app for the GUI.[^1]                      |
-| Tests   | Unit and integration tests for the API.                                                                                                                                                                                          |
+| Project | Purpose                                                                                                                                                                                                                         |
+|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Setup   | Console app for database creation, regeneration of Entity Framework classes (if the database schema changes), and manually running some API functions via console.                                                              |
+| Core    | The auto-generated Entity Framework classes. Extra methods for objects should live in classes that extend these ones (in the appropriate other project) so they can easily be regenerated if the database schema changes.       |
+| Common  | Centralised configuration, utility classes, extension methods, etc.                                                                                                                                                             |
+| API     | The back-end code for handling importing and updating data, fetching data from third-party APIs, getting and transforming data from the database for display, etc.[^1]                                                          |
+| App     | Cross-platform [MAUI](https://dotnet.microsoft.com/en-us/apps/maui) app for the GUI.[^1]                      |
+| Tests   | Unit and integration tests for the API.                                                                                                                                                                                         |
 
 ### Running the app
 
-Run configurations are provided for Rider, but whether you want to use them will depend on what you're doing. Notably, [hot reload support](https://www.jetbrains.com/help/rider/MAUI.html#hot-reload) is limited in Rider.
+Run configurations are provided for Rider. To use what hot reload support is available, use the built-in Run configurations in debug mode.
 
-To use what hot reload support is available, use the built-in Run configurations in debug mode.
-
-#### Windows
-To run in Windows with improved hot reload support, run from the terminal and select Windows as the target platform:
+Alternatively, you can run from the terminal and select the target platform when prompted.
 
 ```powershell
 dotnet watch run
 ```
+**Note:** Before running in Android, you will need to set up a simulator (virtual device) in Rider's Device Manager. Select a minimum of API version 34.
 
-#### Android
-Before running in Android, you will need to set up a simulator (virtual device) in Rider's Device Manager. Select a minimum of API version 36.
+#### Hot reload
 
-Then, either use the built-in run configuration to automatically start the app on the first available simulator. 
+When running from the terminal or using a Rider Run config in debug mode, hot reload is supported for the C# code in the app, but not XAML. (In Visual Studio, it's [the other way around](https://learn.microsoft.com/en-us/dotnet/maui/xaml/hot-reload)).
 
-Running from the terminal is also possible, but hot reload of Razor components is not supported for Android, so it is recommended to work on these while running the Windows app in the first instance and then test them on Android later.
-
+You may need to click "Apply changes" in the floating toolbar in Rider (or set a keyboard shortcut and use that).
 
 ### Troubleshooting
 
@@ -111,6 +112,16 @@ If you see lots of IDE errors after first setting up the project, try:
   - In the Solution Explorer, right-click on the solution and select "Reload all projects"
   - Check your system environment variables and ensure Rider is seeing the correct values in Settings > Tools > Terminal (if not, restart Rider and Jetbrains Toolbox; you can also override them for the duration of your session from that Settings dialog)
   - From the `./app` directory, run `maui doctor`
+
+> Workload update failed: Value cannot be null. (Parameter 's')
+
+If you get this error when installing the MAUI workload, open an elevated PowerShell terminal, `cd` to the project directory, and run:
+```powershell
+dotnet workload install maui --no-cache
+```
+
+Then back in Rider, close and re-open the terminal before running `maui doctor` to check the dependencies again.
+
 
 #### System environment variables
 
@@ -125,6 +136,8 @@ System environment variables you may need to check and update if something is no
   - `C:\Android\android-sdk\tools\bin`
   - `C:\Android\android-sdk\platform-tools`
   - `C:\Program Files\Microsoft\jdk-21.0.11.10-hotspot\bin`
+
+If `maui doctor` or `Get-Command <thing>` are showing different paths in Rider's terminal, check for and remove unwanted overrides in Settings > Tools > Terminal.
 
 [^3]: Or the equivalent paths/versions if yours are different.
 

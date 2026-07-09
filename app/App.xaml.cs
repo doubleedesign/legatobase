@@ -1,3 +1,5 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+
 namespace Legatobase.App;
 
 public partial class App : Application {
@@ -6,6 +8,6 @@ public partial class App : Application {
 	}
 
 	protected override Window CreateWindow(IActivationState? activationState) {
-		return new Window(new MainPage()) { Title = "Legatobase" };
+		return new Window(new AppShell());
 	}
 }
