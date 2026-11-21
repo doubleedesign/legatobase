@@ -36,7 +36,7 @@ public class Logger {
 	
 	public static void Warning(string message, string extra = "", bool logToFile = false) {
 		Console.ForegroundColor = ConsoleColor.Yellow;
-		Console.WriteLine("⚠️ " + message.PadRight(LABEL_WIDTH) + extra);
+		Console.WriteLine("⚠️  " + message.PadRight(LABEL_WIDTH) + extra);
 		Console.ResetColor();
 		if (logToFile) {
 			LogToFile("⚠️ " + message + " " + extra);
@@ -45,7 +45,7 @@ public class Logger {
 
 	public static void Info(string message, string extra = "", bool logToFile = false) {
 		Console.ForegroundColor = ConsoleColor.Cyan;
-		Console.WriteLine("📄 " + message.PadRight(LABEL_WIDTH) + extra);
+		Console.WriteLine("📄  " + message.PadRight(LABEL_WIDTH) + extra);
 		Console.ResetColor();
 		if (logToFile) {
 			LogToFile("📄 " + message + " " + extra);
