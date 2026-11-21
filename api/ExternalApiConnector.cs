@@ -26,7 +26,7 @@ public abstract class ExternalApiConnector {
 		// Set some request headers that are the same for all requests for all APIs
 		this._requestHeaders = new Dictionary<string, string> {
 			{ "User-Agent", UserAgent },
-			{ "Content-Type", "application/json" }
+			{ "Accept", "application/json" }
 		};
 
 		// Allow child classes to add their own "always use" headers at instantiation
