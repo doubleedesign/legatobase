@@ -6,23 +6,23 @@ namespace Legatobase.API;
 
 public abstract class ExternalApiConnector {
 	private readonly string _baseUrl;
-	protected readonly HttpClient Client;
+	private readonly HttpClient _client;
 	private Dictionary<string, string> _requestHeaders;
-	protected int? RequestFrequency { get; set; }
+	private readonly int? _waitBetweenRequests;
 	protected int? MaxRetries { get; set; } = 5;
-	protected int? RetriesAttempted { get; set; } = 0;
-	private long? LastRequestTimeStamp { get; set; }
+	private int? _retriesAttempted = 0;
+	private long? _lastRequestTimeStamp;
 
 	private string UserAgent {
 		get => $"Legatobase/{Config.GetVersion()}({Config.GetUrl()})";
 	}
-
-	protected ExternalApiConnector(string baseUrl, Dictionary<string, string>? commonRequestHeaders = null, HttpClient? client = null) {
+	
+	protected ExternalApiConnector(string baseUrl, Dictionary<string, string>? commonRequestHeaders = null, HttpClient? client = null, int? waitBetweenRequests = 0) {
 		this._baseUrl = baseUrl;
 		this._client = client ?? new HttpClient();
-		this.RequestFrequency = null;
-		this.LastRequestTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-		
+		this._waitBetweenRequests = waitBetweenRequests;
+		this._lastRequestTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+	
 		// Set some request headers that are the same for all requests for all APIs
 		this._requestHeaders = new Dictionary<string, string> {
 			{ "User-Agent", UserAgent },
@@ -60,21 +60,21 @@ public abstract class ExternalApiConnector {
 	}
 	
 	private async Task MaybeThrottleRequest() {
-		bool throttle = this.WaitBetweenRequests > 0 && this.LastRequestTimeStamp.HasValue && (DateTimeOffset.UtcNow.ToUnixTimeSeconds() - this.LastRequestTimeStamp.Value) < this.WaitBetweenRequests;
+		bool throttle = this._waitBetweenRequests > 0 && this._lastRequestTimeStamp.HasValue && (DateTimeOffset.UtcNow.ToUnixTimeSeconds() - this._lastRequestTimeStamp.Value) < this._waitBetweenRequests;
 		if(!throttle) {
 			return;
 		}
 		
-		var timeSinceLastRequest = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - this.LastRequestTimeStamp;
+		var timeSinceLastRequest = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - this._lastRequestTimeStamp;
 		var timeToWait = this._waitBetweenRequests - timeSinceLastRequest;
 		if (timeToWait > 0) {
-			Logger.Warning($"Throttling request for {timeToWait}ms to avoid exceeding rate of 1 request per {this.WaitBetweenRequests}ms", logToFile: true);
+			Logger.Warning($"Throttling request for {timeToWait}ms to avoid exceeding rate of 1 request per {this._waitBetweenRequests}ms", logToFile: true);
 			await Task.Delay((int)timeToWait);
 		}
 	}
 	
 	private async Task<HttpResponseMessage> DoGet(string path, Dictionary<string, string>? queryParams = null, Dictionary<string, string>? headers = null) {
-		this.LastRequestTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+		this._lastRequestTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 		
 		var empty = new Dictionary<string, string>();
 		var mergedheaders = headers != null ? this._requestHeaders.MergeWith<string, string>(headers) : this._requestHeaders;
@@ -95,11 +95,11 @@ public abstract class ExternalApiConnector {
 	}
 
 	private async Task<HttpResponseMessage> RetryGet(string path, Dictionary<string, string>? queryParams = null, Dictionary<string, string>? headers = null) {
-		while (this.RetriesAttempted < this.MaxRetries) {
+		while (this._retriesAttempted < this.MaxRetries) {
 			Logger.Info($"Waiting {this._waitBetweenRequests ?? 1000}ms before retrying request to {this._baseUrl}/{path}", logToFile: true);
 			await Task.Delay(this._waitBetweenRequests ?? 1000);
 			var response = await this.DoGet(path, queryParams, headers);
-			this.RetriesAttempted++;
+			this._retriesAttempted++;
 			
 			if (response.IsSuccessStatusCode) {
 				Logger.Success($"Request to {this._baseUrl}/{path} succeeded with response: {(int)response.StatusCode}", logToFile: true);
@@ -107,6 +107,6 @@ public abstract class ExternalApiConnector {
 			}
 		}
 		
-		throw new HttpRequestException($"Request to {this._baseUrl}/{path} failed after {this.RetriesAttempted} retries");
+		throw new HttpRequestException($"Request to {this._baseUrl}/{path} failed after {this._retriesAttempted} retries");
 	}
 }
