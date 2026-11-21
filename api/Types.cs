@@ -1,6 +1,4 @@
-
-global using SimpleDataObject = System.Collections.Generic.Dictionary<string, OneOf.OneOf<string,int>>;
-
+global using SimpleDataObject = System.Collections.Generic.Dictionary<string, Legatobase.Common.SimpleDataValue>;
 namespace Legatobase.API;
 
 /// <summary>

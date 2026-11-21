@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <TargetFramework>net11.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AssemblyName>LegatoBase.Common</AssemblyName>
         <RootNamespace>LegatoBase.Common</RootNamespace>
+        <LangVersion>15</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,7 +15,6 @@
 
     <ItemGroup>
       <PackageReference Include="FluentHttpClient" Version="5.0.2" />
-      <PackageReference Include="OneOf" Version="3.0.271" />
     </ItemGroup>
     
 </Project>
