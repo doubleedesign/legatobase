@@ -39,12 +39,17 @@ public abstract class ExternalApiConnector {
 		var empty = new Dictionary<string, string>();
 		var mergedheaders = headers != null ? this._requestHeaders.MergeWith<string, string>(headers) : this._requestHeaders;
 
-		HttpResponseMessage result = await this._client
+		HttpResponseMessage response = await this._client
 			.UsingRoute($"{this._baseUrl}/{path}")
 			.WithQueryParameters((IEnumerable<KeyValuePair<string, string?>>)(queryParams ?? empty))
 			.WithHeaders(mergedheaders)
 			.GetAsync();
-
-		return await result.GetResultObject();
+		
+		if (!response.IsSuccessStatusCode) {
+			Logger.Error($"Request to {path} failed with response: {response.StatusCode} {response.ReasonPhrase}");
+			throw new HttpRequestException(response.ReasonPhrase);
+		}
+		
+		return await response.GetResultObject();
 	} 
 }
