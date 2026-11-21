@@ -38,6 +38,7 @@ public abstract class ExternalApiConnector {
 	protected async Task<JsonObject> Get(string path, Dictionary<string, string>? queryParams = null, Dictionary<string, string>? headers = null) {
 		var empty = new Dictionary<string, string>();
 		var mergedheaders = headers != null ? this._requestHeaders.MergeWith<string, string>(headers) : this._requestHeaders;
+		Logger.Info($"Request made to {this._baseUrl}/{path}", logToFile: true);
 
 		HttpResponseMessage response = await this._client
 			.UsingRoute($"{this._baseUrl}/{path}")
@@ -46,9 +47,11 @@ public abstract class ExternalApiConnector {
 			.GetAsync();
 		
 		if (!response.IsSuccessStatusCode) {
-			Logger.Error($"Request to {path} failed with response: {response.StatusCode} {response.ReasonPhrase}");
+			Logger.Error($"Request to {this._baseUrl}/{path} failed with response: \n \t \t \t \t \t \t \t {(int)response.StatusCode} {response.ReasonPhrase}", logToFile: true);
 			throw new HttpRequestException(response.ReasonPhrase);
 		}
+
+		Logger.Success($"Request to {path} succeeded with response: {(int)response.StatusCode}", logToFile: true);
 		
 		return await response.GetResultObject();
 	} 
