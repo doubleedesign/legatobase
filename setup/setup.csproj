@@ -18,9 +18,9 @@
 
     <ItemGroup>
       <PackageReference Include="AdysTech.CredentialManager" Version="3.1.0" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.8" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="11.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="11.0.0" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="11.0.0" />
       <PackageReference Include="Plist.Kit" Version="1.0.0" />
       <PackageReference Include="Spectre.Console" Version="0.55.2" />
     </ItemGroup>
