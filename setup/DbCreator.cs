@@ -24,6 +24,11 @@ public class DbCreator {
 				Id		INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
 				Label	VARCHAR	NOT NULL
 			)",
+			
+			["FileTypes"] = @"CREATE TABLE IF NOT EXISTS FileTypes (
+    			Id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
+    			Label VARCHAR NOT NULL
+    		)",
 
 			["Tracks"] = @"CREATE TABLE IF NOT EXISTS Tracks (
 				Id				INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
@@ -41,14 +46,11 @@ public class DbCreator {
 				Length			INTEGER,
 				BitRate 		INTEGER,
 				SampleRate		INTEGER,
-				FOREIGN KEY (GenreId) REFERENCES Genres(Id)
+				FOREIGN KEY (GenreId) REFERENCES Genres(Id),
+                FOREIGN KEY (FileTypeId) REFERENCES FileTypes(Id)  
 			)",
-			
-			["FileTypes"] = @"CREATE TABLE IF NOT EXISTS FileTypes (
-    			Id INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
-    			Label VARCHAR NOT NULL
-    		)",
-			
+		
+			// Supertype
 			["Artists"] = @"CREATE TABLE IF NOT EXISTS Artists(
     			Id				INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
 				Name 			VARCHAR	NOT NULL,
@@ -60,30 +62,31 @@ public class DbCreator {
 				BirthDate 		DATE,
 				DeathDate 		DATE
 			)",	
-
+			// Artist subtype 1
 			["Groups"] = @"CREATE TABLE IF NOT EXISTS Groups(
     			Id				INTEGER PRIMARY KEY UNIQUE NOT NULL,
     			Origin			VARCHAR,
     			FoundedDate 	DATE,
     			EndedDate		DATE,
-    			FOREIGN KEY (Id) REFERENCES Artists(Id)
+    			FOREIGN KEY (Id) REFERENCES Artists(Id) ON DELETE CASCADE
     		)",
-			
+			// Artist subtype 2
 			["People"] = @"CREATE TABLE IF NOT EXISTS People(
 				Id				INTEGER PRIMARY KEY UNIQUE NOT NULL,
 				Hometown 		VARCHAR,
 				BirthDate 		VARCHAR,
 				DeathDate 		VARCHAR,
-				FOREIGN KEY (Id) REFERENCES Artists(Id)
+				FOREIGN KEY (Id) REFERENCES Artists(Id) ON DELETE CASCADE 
 			)",
 			
-			["Artists_Groups"] = @"CREATE TABLE IF NOT EXISTS ArtistsGroups(
+			["Artists_Groups"] = @"CREATE TABLE IF NOT EXISTS Artists_Groups(
+    			RelationId		INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE NOT NULL,
 			    ArtistId 		INTEGER NOT NULL,
 			    GroupId 		INTEGER NOT NULL,
 			    MembershipStart	VARCHAR,
 			    MembershipEnd	VARCHAR,
-			    FOREIGN KEY (ArtistId) REFERENCES Artists(Id),
-			    FOREIGN KEY (GroupId) REFERENCES Artists(Id)
+			    FOREIGN KEY (ArtistId) REFERENCES People(Id),
+			    FOREIGN KEY (GroupId) REFERENCES Groups(Id)
 			)",
 			
 			["Albums"] = @"CREATE TABLE IF NOT EXISTS Albums(
@@ -124,6 +127,7 @@ public class DbCreator {
 		};
 
 		Logger.Info("Creating database tables");
+		int errors = 0;
 		foreach (var (tableName, sql) in tables) {
 			try {
 				if(this.TableExists(tableName, connection)) {
@@ -140,7 +144,8 @@ public class DbCreator {
 					Logger.Success("Created table", tableName);
 				}
 				else {
-					throw new Exception($"Failed to create table {tableName}");
+					Logger.Error($"Failed to create table {tableName}");
+					errors++;
 				}
 			}
 			catch (Exception e) {
@@ -150,6 +155,11 @@ public class DbCreator {
 		}
 		
 		connection.Close();
+		
+		if (errors > 0) {
+			Logger.Error($"Failed to create {errors} tables");
+			Environment.Exit(1);
+		}
 	}
 
 	private bool TableExists(string tableName, SqliteConnection connection) {
