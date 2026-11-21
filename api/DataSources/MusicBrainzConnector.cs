@@ -7,6 +7,7 @@ namespace Legatobase.API.Datasources;
 public class MusicBrainzConnector : ExternalApiConnector, IExternalApi {
 
 	public MusicBrainzConnector() : base("https://musicbrainz.org/ws/2") {
+		this.RequestFrequency = 3600;
 	}
 
 	public async Task<JsonObject> Search(string entityType, string searchTerm) {

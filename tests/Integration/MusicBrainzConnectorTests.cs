@@ -4,9 +4,11 @@ using Legatobase.API.Datasources;
 namespace LegatoBase.Tests.Integration;
 
 public class MusicBrainzConnectorTests {
+	private readonly ITestOutputHelper _testOutputHelper;
 	private readonly MusicBrainzConnector instance;
 	
-	public MusicBrainzConnectorTests() {
+	public MusicBrainzConnectorTests(ITestOutputHelper testOutputHelper) {
+		this._testOutputHelper = testOutputHelper;
 		this.instance = new MusicBrainzConnector();
 	}
 	
