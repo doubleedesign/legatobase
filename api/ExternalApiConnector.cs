@@ -47,12 +47,12 @@ public abstract class ExternalApiConnector {
 		
 		HttpResponseMessage response = await this.DoGet(path, queryParams, headers);
 		if (response.IsSuccessStatusCode) {
-			Logger.Success($"Request to {this._baseUrl}/{path} succeeded with response: {(int)response.StatusCode}", logToFile: true);
 			return await response.GetResultObject();
 		}
 		
 		if (response.IsRetryable()) {
-			return await this.RetryGet(path, queryParams, headers);
+			var result = await this.RetryGet(path, queryParams, headers);
+			return await result.GetResultObject();
 		}
 		
 		Logger.Error($"Request to {this._baseUrl}/{path} failed with response: \n \t \t \t \t \t \t \t {(int)response.StatusCode} {response.ReasonPhrase}", logToFile: true);
@@ -66,7 +66,7 @@ public abstract class ExternalApiConnector {
 		}
 		
 		var timeSinceLastRequest = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - this.LastRequestTimeStamp;
-		var timeToWait = this.WaitBetweenRequests - timeSinceLastRequest;
+		var timeToWait = this._waitBetweenRequests - timeSinceLastRequest;
 		if (timeToWait > 0) {
 			Logger.Warning($"Throttling request for {timeToWait}ms to avoid exceeding rate of 1 request per {this.WaitBetweenRequests}ms", logToFile: true);
 			await Task.Delay((int)timeToWait);
@@ -86,19 +86,24 @@ public abstract class ExternalApiConnector {
 			.GetAsync();
 		
 		Logger.Info($"Request made to {this._baseUrl}/{path}", logToFile: true);
-		
+
+		if (response.IsSuccessStatusCode) {
+			Logger.Success($"Request to {this._baseUrl}/{path} succeeded with response: {(int)response.StatusCode}", logToFile: true);
+		}
+
 		return response;
 	}
 
-	private async Task<JsonObject> RetryGet(string path, Dictionary<string, string>? queryParams = null, Dictionary<string, string>? headers = null) {
+	private async Task<HttpResponseMessage> RetryGet(string path, Dictionary<string, string>? queryParams = null, Dictionary<string, string>? headers = null) {
 		while (this.RetriesAttempted < this.MaxRetries) {
-			Logger.Info($"Waiting {this.RequestFrequency ?? 1000}ms before retrying request to {this._baseUrl}/{path}", logToFile: true);
-			await Task.Delay(this.RequestFrequency ?? 1000);
-			var result = await this.DoGet(path, queryParams, headers);
+			Logger.Info($"Waiting {this._waitBetweenRequests ?? 1000}ms before retrying request to {this._baseUrl}/{path}", logToFile: true);
+			await Task.Delay(this._waitBetweenRequests ?? 1000);
+			var response = await this.DoGet(path, queryParams, headers);
 			this.RetriesAttempted++;
 			
-			if (result.IsSuccessStatusCode) {
-				return await result.GetResultObject();
+			if (response.IsSuccessStatusCode) {
+				Logger.Success($"Request to {this._baseUrl}/{path} succeeded with response: {(int)response.StatusCode}", logToFile: true);
+				return response;
 			}
 		}
 		
