@@ -1,6 +1,5 @@
 using Legatobase.API.Datasources;
 using Legatobase.Common;
-using Xunit.Abstractions;
 
 namespace LegatoBase.Tests.Integration;
 
