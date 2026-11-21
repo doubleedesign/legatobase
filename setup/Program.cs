@@ -85,7 +85,7 @@ class Program {
 				            "--no-onconfiguring " +
 				            "--namespace Legatobase.Core " +
 				            "--context-namespace Legatobase.Core " +
-							$"--force ",
+							"--force ",
 				WorkingDirectory = solutionRoot,
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,
@@ -106,6 +106,21 @@ class Program {
 			// Use the same handler for "errors" as for standard output
 			// because for some reason messages like "build started" are sent to stderr instead of stdout
 			LogOutput(error);
+		}
+		
+		CleanUpStaleClasses();
+	}
+	
+	static void CleanUpStaleClasses() {
+		string coreDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, @"..\..\..\..\core"));
+		var files = Directory.GetFiles(coreDir, "*.cs", SearchOption.AllDirectories);
+		foreach (var file in files) {
+			// If the file was not generated in the last 5 minutes, delete it
+			var lastWriteTime = File.GetLastWriteTime(file);
+			if (DateTime.Now - lastWriteTime > TimeSpan.FromMinutes(5)) {
+				File.Delete(file);
+				Logger.Warning("Deleted stale class file: ", file);
+			}
 		}
 	}
 

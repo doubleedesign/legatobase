@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Legatobase.Core;
@@ -34,6 +34,8 @@ public partial class Track
     public int? BitRate { get; set; }
 
     public int? SampleRate { get; set; }
+
+    public virtual FileType? FileType { get; set; }
 
     public virtual Genre? Genre { get; set; }
 }

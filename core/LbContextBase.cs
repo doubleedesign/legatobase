@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
@@ -87,18 +87,20 @@ public partial class LbContextBase : DbContext
 
         modelBuilder.Entity<ArtistGroupConnection>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("Artists_Groups");
+            entity.HasKey(e => e.RelationId);
+
+            entity.ToTable("Artists_Groups");
+
+            entity.HasIndex(e => e.RelationId, "IX_Artists_Groups_RelationId").IsUnique();
 
             entity.Property(e => e.MembershipEnd).HasColumnType("VARCHAR");
             entity.Property(e => e.MembershipStart).HasColumnType("VARCHAR");
 
-            entity.HasOne(d => d.Artist).WithMany()
+            entity.HasOne(d => d.Artist).WithMany(p => p.ArtistGroupConnections)
                 .HasForeignKey(d => d.ArtistId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
 
-            entity.HasOne(d => d.Group).WithMany()
+            entity.HasOne(d => d.Group).WithMany(p => p.ArtistGroupConnections)
                 .HasForeignKey(d => d.GroupId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
         });
@@ -145,9 +147,7 @@ public partial class LbContextBase : DbContext
             entity.Property(e => e.FoundedDate).HasColumnType("DATE");
             entity.Property(e => e.Origin).HasColumnType("VARCHAR");
 
-            entity.HasOne(d => d.IdNavigation).WithOne(p => p.Group)
-                .HasForeignKey<Group>(d => d.Id)
-                .OnDelete(DeleteBehavior.ClientSetNull);
+            entity.HasOne(d => d.IdNavigation).WithOne(p => p.Group).HasForeignKey<Group>(d => d.Id);
         });
 
         modelBuilder.Entity<Person>(entity =>
@@ -161,9 +161,7 @@ public partial class LbContextBase : DbContext
             entity.Property(e => e.DeathDate).HasColumnType("VARCHAR");
             entity.Property(e => e.Hometown).HasColumnType("VARCHAR");
 
-            entity.HasOne(d => d.IdNavigation).WithOne(p => p.Person)
-                .HasForeignKey<Person>(d => d.Id)
-                .OnDelete(DeleteBehavior.ClientSetNull);
+            entity.HasOne(d => d.IdNavigation).WithOne(p => p.Person).HasForeignKey<Person>(d => d.Id);
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -189,6 +187,8 @@ public partial class LbContextBase : DbContext
                 .HasColumnName("MBID");
             entity.Property(e => e.ShsId).HasColumnName("SHS_ID");
             entity.Property(e => e.Title).HasColumnType("VARCHAR");
+
+            entity.HasOne(d => d.FileType).WithMany(p => p.Tracks).HasForeignKey(d => d.FileTypeId);
 
             entity.HasOne(d => d.Genre).WithMany(p => p.Tracks).HasForeignKey(d => d.GenreId);
         });

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Legatobase.Core;
@@ -12,6 +12,8 @@ public partial class Group
     public DateTime? FoundedDate { get; set; }
 
     public DateTime? EndedDate { get; set; }
+
+    public virtual ICollection<ArtistGroupConnection> ArtistGroupConnections { get; set; } = new List<ArtistGroupConnection>();
 
     public virtual Artist IdNavigation { get; set; } = null!;
 }
