@@ -6,7 +6,7 @@ namespace Legatobase.API;
 
 public abstract class ExternalApiConnector {
 	private readonly string _baseUrl;
-	private readonly HttpClient _client;
+	protected readonly HttpClient Client;
 	private Dictionary<string, string> _requestHeaders;
 	protected int? RequestFrequency { get; set; }
 	protected int? MaxRetries { get; set; } = 5;
@@ -17,9 +17,9 @@ public abstract class ExternalApiConnector {
 		get => $"Legatobase/{Config.GetVersion()}({Config.GetUrl()})";
 	}
 
-	protected ExternalApiConnector(string baseUrl, Dictionary<string, string>? commonRequestHeaders = null) {
+	protected ExternalApiConnector(string baseUrl, Dictionary<string, string>? commonRequestHeaders = null, HttpClient? client = null) {
 		this._baseUrl = baseUrl;
-		this._client = new HttpClient();
+		this._client = client ?? new HttpClient();
 		this.RequestFrequency = null;
 		this.LastRequestTimeStamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 		
