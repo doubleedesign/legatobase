@@ -100,18 +100,30 @@ class Program {
 		
 		Console.WriteLine("");
 		if (!string.IsNullOrEmpty(output)) {
-			if (output.Contains("failed") || output.Contains("error")) {
-				Logger.Error(output);
-			}
-			else if (output.Contains("Build started")) {
-				Logger.Info(output);
-			}
-			else {
-				Logger.Success(output);
-			}
+			LogOutput(output);
 		}
 		if (!string.IsNullOrEmpty(error)) {
-			Logger.Error(error);
+			// Use the same handler for "errors" as for standard output
+			// because for some reason messages like "build started" are sent to stderr instead of stdout
+			LogOutput(error);
+		}
+	}
+
+	static void LogOutput(string output) {
+		if (output.Contains("Build succeeded")) {
+			Logger.Success(output);
+		}
+		else if (output.Contains("Build started")) {
+			Logger.Info(output);
+		}
+		else if (output.Contains("Build failed")) {
+			Logger.Error(output);
+		}
+		else if (output.Contains("failed") || output.Contains("error")) {
+			Logger.Error(output);
+		}
+		else {
+			Logger.Success(output);
 		}
 	}
 
